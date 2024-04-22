@@ -1,0 +1,16 @@
+{
+  "name": "huwistyle",
+  "version": "1.0.0",
+  "description": "A new clothing Brand",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "clothing",
+    "brand",
+    "fashion"
+  ],
+  "author": "Abhishek Pawara",
+  "license": "ISC"
+}
