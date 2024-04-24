@@ -12,4 +12,8 @@ app.get('/api', (req, res) => {
     res.send("Hello on /api");
 })
 
+app.get('/api/contact', (req, res) => {
+    res.send("This is contact page");
+})
+
 app.listen(PORT, () => console.log(`The server is running on ${PORT}`));
