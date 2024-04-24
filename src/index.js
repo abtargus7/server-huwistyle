@@ -8,4 +8,8 @@ app.get('/', (req, res) => {
     res.send("Hello User");
 })
 
+app.get('/api', (req, res) => {
+    res.send("Hello on /api");
+})
+
 app.listen(PORT, () => console.log(`The server is running on ${PORT}`));
