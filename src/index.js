@@ -1,8 +1,13 @@
 import express from 'express';
-import mongoose from 'mongoose';
+import connectDB from './db/index.js';
+import "dotenv/config";
+
+// dotenv.config({ path : './env'});
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+connectDB();
 
 app.get('/', (req, res) => {
     res.send("Hello User");
