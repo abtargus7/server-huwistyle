@@ -1,28 +1,18 @@
-import express from 'express';
+import express, { Router } from 'express';
 import connectDB from './db/index.js';
 import "dotenv/config";
 
-// dotenv.config({ path : './env'});
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-connectDB();
 
-app.get('/', (req, res) => {
-    res.send("Hello User");
-})
 
-app.get('/api', (req, res) => {
-    res.send("Hello on /api");
-})
 
-app.get('/api/contact', (req, res) => {
-    res.send("This is contact page");
-})
 
-app.get('/api/about', (req, res) => {
-    res.send("This is aobut page");
-})
 
-app.listen(PORT, () => console.log(`The server is running on ${PORT}`));
+connectDB()
+.then(
+    app.listen(PORT, () => console.log(`The server is running on ${PORT}`))
+)
+.catch( (err) => console.log("MONGODB CONNECTION FAILED!!! ", err));
