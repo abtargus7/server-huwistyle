@@ -10,10 +10,15 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    price : {
+    new_price : {
         type: Number,
         default: 0,
         required: true 
+    },
+    old_price : {
+        type: Number,
+        default: 0,
+        required: true
     },
     stock : {
         type: Number,

@@ -13,6 +13,12 @@ app.use(express.urlencoded({extended: true, limit: "16kb"}));
 app.use(express.static("public"));
 app.use(cookieParser());
 
+//routes import
+import productRouter from "./routes/product.route.js";
+
+
+//routes declaration
+app.use("/api/v1/products", productRouter);
 
 
 export { app };
