@@ -1,10 +1,11 @@
-import { asyncHandler } from "../utils/asyncHandler";
-import { ApiError} from "../utils/ApiError"
-import { User } from "../models/user.model";
-import { ApiResponse } from "../utils/ApiResponse";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError} from "../utils/ApiError.js"
+import { User } from "../models/user.model.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 
 const registerUser = asyncHandler ( async (req, res) => {
     const {username, fullName, email, password} = req.body;
+    console.log(req.body)
 
     if(
         [fullName, email, username, password].some((field) => 
@@ -21,14 +22,17 @@ const registerUser = asyncHandler ( async (req, res) => {
         throw new ApiError(409, "User with email or username already exists")
     }
 
-    const user = await User.create({
-        fullName,
-        password,
-        email,
-        username: username.toLowerCase()
+    const user = new User({
+        fullName: fullName,
+        password: password,
+        email: email,
+        username: username
     })
 
-    const createdUser = await User.findById(user._id).select(
+    const isCreated = await user.save()
+    console.log(isCreated);
+
+    const createdUser = await User.findById(isCreated._id).select(
         "-password -refreshToken"
     )
 
