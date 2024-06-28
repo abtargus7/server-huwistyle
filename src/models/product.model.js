@@ -27,15 +27,19 @@ const productSchema = new mongoose.Schema({
     productImage : {
         type: String,
     },
+    SKU: {
+        type: String,
+        unique: true
+    },
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Category",
         required: true
     },
-    owner: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+    available: {
+        type: Boolean,
+        default: true
     }
-})
+}, {timestamps: true})
 
-export const Product = mongoose.model("User", productSchema);
+export const Product = mongoose.model("Product", productSchema);
