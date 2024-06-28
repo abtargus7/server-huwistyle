@@ -10,12 +10,12 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    new_price : {
+    newPrice : {
         type: Number,
         default: 0,
         required: true 
     },
-    old_price : {
+    oldPrice : {
         type: Number,
         default: 0,
         required: true
@@ -24,18 +24,18 @@ const productSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    productImage : {
-        type: String,
+    productImages : {
+        type: [String],
     },
     SKU: {
         type: String,
         unique: true
     },
-    category: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Category",
-        required: true
-    },
+    // category: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Category",
+    //     required: true
+    // },
     available: {
         type: Boolean,
         default: true
