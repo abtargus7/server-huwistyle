@@ -4,6 +4,7 @@ import { uploadOnCloudinary } from "../utils/cloulinary.js"
 import { Product } from "../models/product.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import fs from "fs"
 
 const addProducts = asyncHandler( async( req, res)=> {
     //access req.body
@@ -18,16 +19,32 @@ const addProducts = asyncHandler( async( req, res)=> {
 
     const {name, description, newPrice, oldPrice, stock, productImages, SKU, category, available} = req.body;
 
+    const products = await Product.find({});
+    let id;
+
+    if(products.length > 0) {
+        let lastProductArray = products.slice(-1);
+        let lastProduct = lastProductArray[0];
+        id = lastProduct.id + 1;
+    } else {
+        id = 1;
+    }
+
     console.log(req.files);
     let productImagesCloudnary = [];
     let imageURLs = []
     for(let i = 0; i < req.files.length; i++){
-        productImagesCloudnary[i] = await uploadOnCloudinary(req.files?.[i]?.path);
-        imageURLs[i] = productImagesCloudnary[i].url;
+        productImagesCloudnary[i] = await uploadOnCloudinary(req.files[i]?.path);
+        if(!productImagesCloudnary[i]) {
+            throw new ApiError(401, "Error while uploading images. Make sure you have stable internet connection");
+        }
+        console.log(productImagesCloudnary[i])
+        imageURLs[i] = productImagesCloudnary[i]?.url;
+        fs.unlinkSync(req.files[i].path)
     }
-    console.log(imageURLs);
 
     const product = new Product({
+        id : id,
         name,
         description,
         oldPrice,
@@ -39,12 +56,13 @@ const addProducts = asyncHandler( async( req, res)=> {
         available
     }) 
 
+    imageURLs = [];
+
     const isCreated = await product.save();
 
     if(!isCreated){
         throw new ApiError(501, "Something went wrong while adding Product")
     }
-
     return res.status(201).json(new ApiResponse(200, isCreated, "Product Added Successfully"))
 })
 
