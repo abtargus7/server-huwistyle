@@ -1,5 +1,5 @@
 import {asyncHandler} from "../utils/asyncHandler.js"
-import { uploadOnCloudinary } from "../utils/cloulinary.js"
+import { removeFromCloudinary, uploadOnCloudinary } from "../utils/cloulinary.js"
 import { Product } from "../models/product.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -63,47 +63,45 @@ const addProducts = asyncHandler( async( req, res)=> {
 
 
 const removeProduct = asyncHandler( async(req, res) => {
+    const productToBeRemoved = await Product.findOne({id: req.body.id});
+
+    console.log(productToBeRemoved);
+
+    // remove productImages from cloudinary
+    let productImageNames = [];
+    const {productImages} = productToBeRemoved;
+    for(let i = 0; i < productImages.length; i++){
+        const productImageURL = productImages[i].split("/");
+        const productImage = productImageURL[productImageURL.length -1].split(".");
+        const productImageName = productImage[0];
+
+        productImageNames[i] = productImageName;
+    }
+    
+    console.log(productImageNames);
+    
     const removedProduct = await Product.findOneAndDelete({id: req.body.id})
     if(!removeProduct) {
         throw new ApiError(501, "Failed to remove product.")
     }
-    console.log(removedProduct)
+
+    const removeImages = await removeFromCloudinary(productImageNames);
+    if(!removeImages) {
+        throw new ApiError(501, "Failed to remove Images");
+    }
+    console.log(removeImages);
     
     return res.status(201).json(new ApiResponse(200, removedProduct, "Product removed successfully!"))
 })
 
-//test code for uploading image
-const uploadImage = asyncHandler(async (req, res)=> {
-    try{
-        console.log(req.file.path)
-        if(!req.file.path){
-            return null;
-        }
-        const result = await uploadOnCloudinary(req.file.path);
-        console.log(result);
-
-        return res.status(200).json({
-            success: true,
-            imageUrl: result.url
-        })
-    } catch (error) {
-        return res.status(500).json({
-            success: false,
-            error: error
-        })
-    }
-})
-
 const getProducts = asyncHandler( async( req, res) => {
-    try{
-        return res.status(200).json({
-            message: "Get All Products"
-        })
-    } catch {
-        return res.json({
-            error: error
-        })
+    const products = await Product.find({});
+
+    if(!products) {
+        throw new ApiError(501, "Something went wrong while fetching Products")
     }
+    //send response
+    return res.status(201).json(new ApiResponse(200, products, "Fetched all products"))
 })
 
-export {addProducts, getProducts, uploadImage, removeProduct};
+export {addProducts, getProducts, removeProduct};

@@ -21,7 +21,6 @@ const uploadOnCloudinary = async (localFilePath) => {
         //     throw new ApiError(401, "Something went Wrong while uploading image!");
         // }
         console.log("file is uploaded on cloudinary ", uploadResult.url);
-        // fs.unlink(localFilePath)
         return uploadResult;
     } catch (error) {
         fs.unlinkSync(localFilePath); //remove the locally saved temp file as the upload opration got failed
@@ -29,4 +28,22 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
-export {uploadOnCloudinary};
+const removeFromCloudinary = async(arrayOfImageNames) => {
+    try{
+        if(!arrayOfImageNames) return null;
+
+        const deleteResult = await cloudinary.api.delete_resources(arrayOfImageNames);
+        console.log(deleteResult)
+
+        if(!deleteResult) {
+            throw new ApiError(501, "Something Went wrong while uploading images")
+        }
+        console.log("files are removed from cloudinary");
+        return deleteResult;
+
+    } catch (error) {
+        return error;
+    }
+}
+
+export {uploadOnCloudinary, removeFromCloudinary};
