@@ -1,5 +1,4 @@
 import {asyncHandler} from "../utils/asyncHandler.js"
-import { upload } from "../middlewares/multer.middleware.js"
 import { uploadOnCloudinary } from "../utils/cloulinary.js"
 import { Product } from "../models/product.model.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -7,18 +6,11 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import fs from "fs"
 
 const addProducts = asyncHandler( async( req, res)=> {
-    //access req.body
-    //write code for automatically generate product id
-    //upload images using multer
-    //check if uploaded on multer
-    //upload images on cloudinary
-    //check if uploaded on cloudinary
-    //create product using product model
-    //check if product successfully created
-    //send res
 
+    //access req.body
     const {name, description, newPrice, oldPrice, stock, productImages, SKU, category, available} = req.body;
 
+    //write code for automatically generate product id
     const products = await Product.find({});
     let id;
 
@@ -30,11 +22,13 @@ const addProducts = asyncHandler( async( req, res)=> {
         id = 1;
     }
 
-    console.log(req.files);
+    //upload images on cloudinary
     let productImagesCloudnary = [];
     let imageURLs = []
     for(let i = 0; i < req.files.length; i++){
         productImagesCloudnary[i] = await uploadOnCloudinary(req.files[i]?.path);
+        
+        //check if uploaded on cloudinary
         if(!productImagesCloudnary[i]) {
             throw new ApiError(401, "Error while uploading images. Make sure you have stable internet connection");
         }
@@ -43,6 +37,7 @@ const addProducts = asyncHandler( async( req, res)=> {
         fs.unlinkSync(req.files[i].path)
     }
 
+    //create product using product model
     const product = new Product({
         id : id,
         name,
@@ -55,15 +50,26 @@ const addProducts = asyncHandler( async( req, res)=> {
         category,
         available
     }) 
-
-    imageURLs = [];
-
     const isCreated = await product.save();
 
+    //check if product successfully created
     if(!isCreated){
         throw new ApiError(501, "Something went wrong while adding Product")
     }
-    return res.status(201).json(new ApiResponse(200, isCreated, "Product Added Successfully"))
+
+    //send res
+    return res.status(201).json(new ApiResponse(200, isCreated, "Product Added Successfully!"))
+})
+
+
+const removeProduct = asyncHandler( async(req, res) => {
+    const removedProduct = await Product.findOneAndDelete({id: req.body.id})
+    if(!removeProduct) {
+        throw new ApiError(501, "Failed to remove product.")
+    }
+    console.log(removedProduct)
+    
+    return res.status(201).json(new ApiResponse(200, removedProduct, "Product removed successfully!"))
 })
 
 //test code for uploading image
@@ -100,4 +106,4 @@ const getProducts = asyncHandler( async( req, res) => {
     }
 })
 
-export {addProducts, getProducts, uploadImage};
+export {addProducts, getProducts, uploadImage, removeProduct};
